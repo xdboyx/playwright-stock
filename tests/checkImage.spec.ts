@@ -4,6 +4,7 @@ const Tesseract = require('tesseract.js');
 
 const FILITER_DATE = new Date('2024-01-01');
 
+//測試轉一個圖片程式
 test('get stock', async ({ page }) => {
   // test.setTimeout(120000)
 
@@ -11,7 +12,7 @@ test('get stock', async ({ page }) => {
 
   // await page.waitForLoadState('load');
 
-  const filePath = './img/Screenshot_20240427_214621.jpg';
+  const filePath = './img/example.jpg';
 
   var recognizeFile = await recognizeText(filePath)
 

@@ -3,6 +3,7 @@ const ExcelJS = require('exceljs');
 
 const FILITER_DATE = new Date('2024-01-01');
 
+//抓領股倉的資料 會export 一個 data.xlsx的檔案
 test('get stock', async ({ page }) => {
   test.setTimeout(120000)
 

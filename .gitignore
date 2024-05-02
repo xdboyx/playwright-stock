@@ -126,3 +126,4 @@ dist
 .yarn/install-state.gz
 .pnp.*
 playwright-report/index.html
+playwright-report/index.html

@@ -67,7 +67,7 @@ async function recognizeText(imagePath) {
     console.log(result.data.text);
     const dataText = result.data.text
 
-    const regexNumber = /證券 代號 :?\s*(\d{4})/;
+    const regexNumber = /下 列 為 貴 股東 對 (\d{4})/;
     const matchNumber = dataText.match(regexNumber);
 
     const regexName = /戶 名 : (.+)/;

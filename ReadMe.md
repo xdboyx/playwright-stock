@@ -24,7 +24,7 @@ https://www.npmjs.com/package/tesseract.js
 `npm i tesseract.js`
 
 ### 怎麼使用
-解壓縮後  
+解壓縮後開啟vscode，開啟vscode的終端機，輸入以下指令
 `npm install`  
 `npx playwright install`  
 

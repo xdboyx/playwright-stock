@@ -24,9 +24,9 @@ https://www.npmjs.com/package/tesseract.js
 `npm i tesseract.js`
 
 ### 怎麼使用
-解壓縮後
+解壓縮後  
 `npm install`  
 `npx playwright install`  
 
-把要辨識的圖片放在 img資料夾 (目前有放個 example.png)  
-會自動重新命名圖片名稱 放在 imgRecognize資料夾  
+原始圖片放在 img資料夾 (目前有放個 example.png)  
+結果圖片輸出 imgRecognize資料夾  

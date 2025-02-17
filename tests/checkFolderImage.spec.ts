@@ -237,7 +237,7 @@ test('folder TextToImage', async ({ page }) => {
 // 設定圖片大小
 const WIDTH = 800;
 const HEIGHT = 600;
-const FONT_SIZE = 52;
+const FONT_SIZE = 50;
 const LINE_HEIGHT = FONT_SIZE * 1.2;
 
 // 將文字繪製到圖片上
@@ -246,7 +246,7 @@ const drawTextOnCanvas = (ctx, textArray) => {
   ctx.fillRect(0, 0, WIDTH, HEIGHT); // 填滿背景顏色
 
   ctx.fillStyle = '#000000';
-  ctx.font = `bold ${FONT_SIZE}px`;
+  ctx.font = `bold ${FONT_SIZE}px Microsoft YaHei`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
 

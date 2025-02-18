@@ -11,7 +11,22 @@ const UNRECOGNIZE_IMG_FOLDER = `${BASE_FOLDER}\\Output\\無法辨識圖片`;
 
 interface DataItem {
   id: string;
+  company: string;
+  souvenir: string;
   folderName: string;
+}
+
+interface ExcelData {
+  id: string;
+  company: string;
+  souvenir: string;
+  '靜誼': number;
+  '馨璇': number;
+  '郁翔': number;
+  '承勳': number;
+  '育慧': number;
+  '伊璿': number;
+  '麗玉': number;
 }
 
 //step1: 拿excel 建資料夾
@@ -50,6 +65,9 @@ test('create folder', async ({ page }) => {
 
 //step2: 圖片判斷
 test('recognize image', async ({ page }) => {
+  // 增加執行時間
+  test.setTimeout(60000);
+
   // 讀取 Excel 檔案
   const workbook = xlsx.readFile(`${BASE_FOLDER}\\2025股東會紀念品.xlsx`);
   const sheetName = workbook.SheetNames[0];
@@ -58,16 +76,20 @@ test('recognize image', async ({ page }) => {
   console.dir(jsonData)
 
   let dataList: DataItem[] = [];
+  let summaryData: ExcelData[] = [];
+
   // 遍歷每一列，從第2列開始（跳過標題）
   for (let i = 1; i < jsonData.length; i++) {
     const row = jsonData[i];
     const id = row[0]; // 第一欄
+    const company = row[1]; // 第二欄
+    const souvenir = row[2]; // 第三欄
     const folderName = row[5]; // 第六欄
 
     if (folderName.trim() === '') {
       continue; // 跳過本次迴圈，進入下一次迴圈
     }
-    dataList.push({ id, folderName });
+    dataList.push({ id, company, souvenir, folderName });
   }
 
   console.dir(dataList)
@@ -82,6 +104,11 @@ test('recognize image', async ({ page }) => {
   for (let count = 0; count < files.length; count++) {
     const filePath = files[count];
     console.dir(filePath);
+
+    // 提取 User 資料
+    const userMatch = filePath.match(/\\([^\\]+)\\[^\\]+$/);
+    const user = userMatch ? userMatch[1] : 'Unknown';
+    console.log('上傳者群組:', user);
 
     try {
       var recognizeFile = await recognizeText(filePath);
@@ -114,8 +141,34 @@ test('recognize image', async ({ page }) => {
           fs.writeFileSync(destinationPath, data);
           console.log('圖片已成功複製到:', destinationPath);
 
-          // 刪除原圖片
-          // fs.unlinkSync(filePath);
+          // 更新 summaryData
+          let findData = summaryData.find(item => item.id == numberPart);
+          console.dir(`findData:`);
+          console.dir(findData)
+
+          if (findData)
+            findData[user] = findData[user] + 1;
+          else {
+            const company = dataList.find(item => item.id == numberPart)
+            console.dir(`company:`);
+            console.dir(company)
+
+            findData = {
+              id: numberPart.trim(),
+              company: company!.company,
+              souvenir: company!.souvenir,
+              '靜誼': 0,
+              '馨璇': 0,
+              '郁翔': 0,
+              '承勳': 0,
+              '育慧': 0,
+              '伊璿': 0,
+              '麗玉': 0
+            };
+            findData[user] = 1;
+            summaryData.push(findData);
+          }
+
         } else {
           console.log('未找到對應的資料夾，跳過:', recognizeFile);
           unrecognizeImgCopy(filePath);
@@ -133,6 +186,9 @@ test('recognize image', async ({ page }) => {
     }
   }
 
+  // 匯出整理後的資料到 Excel
+  exportSummaryToExcel(summaryData);
+
   function unrecognizeImgCopy(filePath: never) {
     const data = fs.readFileSync(filePath);
     const fileName = path.basename(filePath);
@@ -145,6 +201,32 @@ test('recognize image', async ({ page }) => {
     fs.writeFileSync(destinationPath, data);
   }
 });
+
+// 匯出整理後的資料到 Excel
+function exportSummaryToExcel(summaryData) {
+  const workbook = xlsx.utils.book_new();
+  const worksheetData = [['公司', '紀念品', '靜誼', '馨璇', '郁翔', '承勳', '育慧', '伊璿', '麗玉', '總計份數']];
+
+  summaryData.forEach(item => {
+    const total = item['靜誼'] + item['馨璇'] + item['郁翔'] + item['承勳'] + item['育慧'] + item['伊璿'] + item['麗玉'];
+    worksheetData.push([
+      item.id + item.company,
+      item.souvenir,
+      item['靜誼'],
+      item['馨璇'],
+      item['郁翔'],
+      item['承勳'],
+      item['育慧'],
+      item['伊璿'],
+      item['麗玉'],
+      total
+    ]);
+  });
+
+  const worksheet = xlsx.utils.aoa_to_sheet(worksheetData);
+  xlsx.utils.book_append_sheet(workbook, worksheet, 'Summary');
+  xlsx.writeFile(workbook, `${BASE_FOLDER_OUTPUT}\\summary.xlsx`);
+}
 
 // 遞迴取得所有檔案
 function getAllFiles(dir) {
